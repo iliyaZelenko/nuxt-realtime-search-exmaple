@@ -11,12 +11,17 @@
             class="list"
             ref="list"
           >
-            <VTextField
-              placeholder="Search"
-              prepend-inner-icon="mdi-magnify"
-              filled
-              @input="searchDebounce"
-            />
+            <div class="list__search-field">
+              <VTextField
+                ref="searchField"
+                v-model="searchStr"
+                placeholder="Search"
+                prepend-inner-icon="mdi-magnify"
+                autofocus
+                filled
+                @input="searchDebounce"
+              />
+            </div>
 
             <div
               v-for="user in list"
@@ -102,12 +107,14 @@ export default {
       list: [],
       infiniteId: 0,
       searchStr: '',
-      // I expected that the selected users should be saved after the search.
+      // I expected that the selected users should be saved after the search. UPD: due to the change of URL during the search ($router.replace), the state will be reset. In the Vue, there is no normal wat to change the route and save state.
       selectedUsers: {},
       markInstance: null
     }
   },
   async fetch () {
+    // To pick up information from the URL's param.
+    this.searchStr = this.$route.params.searchStr || ''
     this.list = await this.$content(CONTENT_NAME)
       .search(this.searchStr)
       .limit(PER_PAGE)
@@ -152,9 +159,7 @@ export default {
         this.markControl(this.searchStr)
       }
     },
-    searchDebounce: debounce(async function search (str) {
-      this.searchStr = str
-
+    searchDebounce: debounce(async function search () {
       this.list = await this.$content(CONTENT_NAME)
         .search(this.searchStr)
         .limit(PER_PAGE)
@@ -165,6 +170,17 @@ export default {
 
       await this.$nextTick()
       this.markControl(this.searchStr)
+
+      if (this.searchStr) {
+        await this.$router.replace({
+          name: 'search',
+          params: {
+            searchStr: this.searchStr
+          }
+        })
+      } else {
+        await this.$router.replace('/')
+      }
     }, 500),
     // Search highlight control.
     markControl (str) {
@@ -176,32 +192,39 @@ export default {
 </script>
 
 <style lang="sass">
-  .list
-    height: 660px
-    overflow-y: auto
-    padding-right: 16px
+.list
+  height: 660px
+  overflow-y: auto
+  padding-right: 16px
 
-    &__item
-      margin-bottom: 20px
-      background: #fafafa
-      border-radius: 5px
-      border: 1px solid transparent
+  &__search-field
+    background: white
+    position: sticky
+    top: 0
+    z-index: 999
+    max-height: 66px
 
-      &-actions
-        border-top: 1px solid #e4e4e4
-        padding: 10px 16px
+  &__item
+    margin-bottom: 20px
+    background: #fafafa
+    border-radius: 5px
+    border: 1px solid transparent
 
-      &-avatar
-        width: 140px
-        max-width: 140px
-        background: grey
-        border-top-left-radius: 5px
-        border-bottom-left-radius: 5px
+    &-actions
+      border-top: 1px solid #e4e4e4
+      padding: 10px 16px
 
-      &-action
-        margin-top: 10px
-        align-self: flex-start
+    &-avatar
+      width: 140px
+      max-width: 140px
+      background: grey
+      border-top-left-radius: 5px
+      border-bottom-left-radius: 5px
 
-      &--selected
-        border-color: blue
+    &-action
+      margin-top: 10px
+      align-self: flex-start
+
+    &--selected
+      border-color: blue
 </style>

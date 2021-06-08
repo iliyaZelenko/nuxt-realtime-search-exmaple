@@ -1,4 +1,14 @@
 export default {
+  router: {
+    extendRoutes (routes, resolve) {
+      routes.push({
+        name: 'search',
+        path: '/search/:searchStr',
+        component: resolve(__dirname, 'pages/index.vue')
+      })
+    }
+  },
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: '%s - bravado-test',

@@ -10,10 +10,13 @@ module.exports = {
   extends: [
     '@nuxtjs',
     'plugin:nuxt/recommended',
+    'plugin:vue/recommended',
     'standard'
   ],
   plugins: [
   ],
   // add your custom rules here
-  rules: {}
+  rules: {
+    'vue/camelcase': 'error'
+  }
 }

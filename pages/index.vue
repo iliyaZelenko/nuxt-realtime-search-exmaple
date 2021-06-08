@@ -11,14 +11,11 @@
     >
       <VCard>
         <VCardText>
-          <div
-            ref="list"
-            class="list"
-          >
+          <div class="list">
             <div class="list__search-field">
               <VTextField
-                ref="searchField"
                 v-model="searchStr"
+                :loading="loadingSearch"
                 placeholder="Search"
                 prepend-inner-icon="mdi-magnify"
                 autofocus
@@ -27,48 +24,50 @@
               />
             </div>
 
-            <div
-              v-for="user in list"
-              :key="getUserUniqueIdentifier(user)"
-              :class="{
-                'list__item d-flex': true,
-                'list__item--selected': isUserSelected(user)
-              }"
-            >
-              <VImg
-                :src="user.avatar"
-                :lazy-src="user.avatar.replace('300x300', '20x20')"
-                class="list__item-avatar"
-              />
+            <div ref="markInitContainer">
+              <div
+                v-for="user in list"
+                :key="getUserUniqueIdentifier(user)"
+                :class="{
+                  'list__item d-flex': true,
+                  'list__item--selected': isUserSelected(user)
+                }"
+              >
+                <VImg
+                  :src="user.avatar"
+                  :lazy-src="user.avatar.replace('300x300', '20x20')"
+                  class="list__item-avatar"
+                />
 
-              <div>
-                <VListItem :key="user.title">
-                  <VListItemContent>
-                    <VListItemTitle class="text-h5">
-                      {{ user.name }}
-                    </VListItemTitle>
+                <div>
+                  <VListItem :key="user.title">
+                    <VListItemContent>
+                      <VListItemTitle class="text-h5">
+                        {{ user.name }}
+                      </VListItemTitle>
 
-                    <VListItemSubtitle class="font-weight-bold">
-                      {{ user.title }}
-                    </VListItemSubtitle>
+                      <VListItemSubtitle class="font-weight-bold">
+                        {{ user.title }}
+                      </VListItemSubtitle>
 
-                    <VListItemSubtitle>
-                      {{ user.address }}, {{ user.city }}
-                    </VListItemSubtitle>
-                  </VListItemContent>
-                  <div class="list__item-action grey--text">
-                    {{ user.email }}
+                      <VListItemSubtitle>
+                        {{ user.address }}, {{ user.city }}
+                      </VListItemSubtitle>
+                    </VListItemContent>
+                    <div class="list__item-action grey--text">
+                      {{ user.email }}
+                    </div>
+                  </VListItem>
+
+                  <div class="list__item-actions">
+                    <VBtn
+                      color="teal"
+                      text
+                      @click="selectUser(user)"
+                    >
+                      {{ isUserSelected(user) ? 'Skip selection' : 'Mark as suitable' }}
+                    </VBtn>
                   </div>
-                </VListItem>
-
-                <div class="list__item-actions">
-                  <VBtn
-                    color="teal"
-                    text
-                    @click="selectUser(user)"
-                  >
-                    {{ isUserSelected(user) ? 'Skip selection' : 'Mark as suitable' }}
-                  </VBtn>
                 </div>
               </div>
             </div>
@@ -112,9 +111,10 @@ export default {
       list: [],
       infiniteId: 0,
       searchStr: '',
-      // I expected that the selected users should be saved after the search. UPD: due to the change of URL during the search ($router.replace), the state will be reset. In the Vue, there is no normal wat to change the route and save state.
+      // I expected that the selected users should be saved after the search.
       selectedUsers: {},
-      markInstance: null
+      markInstance: null,
+      loadingSearch: false
     }
   },
   async fetch () {
@@ -126,7 +126,11 @@ export default {
       .fetch()
   },
   mounted () {
-    this.markInstance = new Mark(this.$refs.list)
+    this.markInstance = new Mark(this.$refs.markInitContainer)
+
+    if (this.searchStr) {
+      this.markControl()
+    }
   },
   methods: {
     getUserUniqueIdentifier (user) {
@@ -165,10 +169,11 @@ export default {
       if (this.searchStr) {
         await this.$nextTick()
         // Applies highlighting to loaded elements.
-        this.markControl(this.searchStr)
+        this.markControl()
       }
     },
     searchDebounce: debounce(async function search () {
+      this.loadingSearch = true
       this.list = await this.$content(CONTENT_NAME)
         .search(this.searchStr)
         .limit(PER_PAGE)
@@ -178,23 +183,25 @@ export default {
       this.infiniteId++
 
       await this.$nextTick()
-      this.markControl(this.searchStr)
+      this.markControl()
 
-      if (this.searchStr) {
-        await this.$router.replace({
+      // Hack to change URL without reloading page (miss Vue's state). There is no normal way to do this in Vue. If you try $router.replace, then the page state will be reset.
+      history.pushState(
+        {},
+        null,
+        this.$router.resolve({
           name: 'search',
           params: {
             searchStr: this.searchStr
           }
-        })
-      } else {
-        await this.$router.replace('/')
-      }
+        }).href
+      )
+      this.loadingSearch = false
     }, SEARCH_DEBOUNCE_WAIT),
     // Search highlight control.
-    markControl (str) {
+    markControl () {
       this.markInstance.unmark()
-      this.markInstance.mark(str)
+      this.markInstance.mark(this.searchStr)
     }
   }
 }

@@ -45,10 +45,5 @@ export default {
   content: {
     // Only search in title and description
     fullTextSearchFields: ['name', 'email', 'title', 'city', 'address']
-  },
-
-  // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
-  vuetify: {
-    customVariables: ['~/assets/variables.scss']
   }
 }

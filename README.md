@@ -1,6 +1,7 @@
 # bravado-test
 
 ![image](https://user-images.githubusercontent.com/13103045/121204997-fb73bc80-c87f-11eb-9c7d-3bdb6299c624.png)
+![image](https://user-images.githubusercontent.com/13103045/121210861-b30acd80-c884-11eb-9acd-91346667a824.png)
 
 ## Build Setup
 

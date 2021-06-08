@@ -13,8 +13,7 @@ module.exports = {
     'plugin:vue/recommended',
     'standard'
   ],
-  plugins: [
-  ],
+  plugins: [],
   // add your custom rules here
   rules: {
     'vue/camelcase': 'error'

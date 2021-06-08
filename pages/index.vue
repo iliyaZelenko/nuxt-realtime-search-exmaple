@@ -1,15 +1,19 @@
 <template>
-  <v-row
+  <VRow
     class="mt-15"
     justify="center"
     align="center"
   >
-    <v-col cols="12" sm="8" md="6">
-      <v-card>
-        <v-card-text>
+    <VCol
+      cols="12"
+      sm="8"
+      md="6"
+    >
+      <VCard>
+        <VCardText>
           <div
-            class="list"
             ref="list"
+            class="list"
           >
             <div class="list__search-field">
               <VTextField
@@ -31,31 +35,31 @@
                 'list__item--selected': isUserSelected(user)
               }"
             >
-              <v-img
+              <VImg
                 :src="user.avatar"
                 :lazy-src="user.avatar.replace('300x300', '20x20')"
                 class="list__item-avatar"
               />
 
               <div>
-                <v-list-item :key="user.title">
-                  <v-list-item-content>
-                    <v-list-item-title class="text-h5">
+                <VListItem :key="user.title">
+                  <VListItemContent>
+                    <VListItemTitle class="text-h5">
                       {{ user.name }}
-                    </v-list-item-title>
+                    </VListItemTitle>
 
-                    <v-list-item-subtitle class="font-weight-bold">
+                    <VListItemSubtitle class="font-weight-bold">
                       {{ user.title }}
-                    </v-list-item-subtitle>
+                    </VListItemSubtitle>
 
-                    <v-list-item-subtitle>
+                    <VListItemSubtitle>
                       {{ user.address }}, {{ user.city }}
-                    </v-list-item-subtitle>
-                  </v-list-item-content>
+                    </VListItemSubtitle>
+                  </VListItemContent>
                   <div class="list__item-action grey--text">
                     {{ user.email }}
                   </div>
-                </v-list-item>
+                </VListItem>
 
                 <div class="list__item-actions">
                   <VBtn
@@ -83,10 +87,10 @@
               Search "{{ searchStr }}" returned no results.
             </template>
           </div>
-        </v-card-text>
-      </v-card>
-    </v-col>
-  </v-row>
+        </VCardText>
+      </VCard>
+    </VCol>
+  </VRow>
 </template>
 
 <script>
@@ -96,6 +100,7 @@ import Mark from 'mark.js'
 
 const PER_PAGE = 4
 const CONTENT_NAME = 'users'
+const SEARCH_DEBOUNCE_WAIT = 500
 
 export default {
   components: {
@@ -132,7 +137,11 @@ export default {
       return this.selectedUsers[this.getUserUniqueIdentifier(user)]
     },
     selectUser (user) {
-      this.$set(this.selectedUsers, this.getUserUniqueIdentifier(user), true)
+      this.$set(
+        this.selectedUsers,
+        this.getUserUniqueIdentifier(user),
+        !this.isUserSelected(user)
+      )
     },
     async infiniteHandler (state) {
       const moreItems = await this.$content(CONTENT_NAME)
@@ -181,7 +190,7 @@ export default {
       } else {
         await this.$router.replace('/')
       }
-    }, 500),
+    }, SEARCH_DEBOUNCE_WAIT),
     // Search highlight control.
     markControl (str) {
       this.markInstance.unmark()

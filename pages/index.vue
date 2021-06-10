@@ -100,7 +100,7 @@ import InfiniteLoading from 'vue-infinite-loading'
 import debounce from 'lodash/debounce'
 import Mark from 'mark.js'
 
-const PER_PAGE = 4
+const PER_PAGE = 6
 const CONTENT_NAME = 'users'
 const SEARCH_DEBOUNCE_WAIT = 500
 

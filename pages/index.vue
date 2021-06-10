@@ -231,8 +231,9 @@ export default {
       padding: 10px 16px
 
     &-avatar
-      width: 140px
-      max-width: 140px
+      width: 140px !important
+      // There was a style conflict in production (Heroku) That's why "!important" is here.
+      max-width: 140px !important
       background: grey
       border-top-left-radius: 5px
       border-bottom-left-radius: 5px

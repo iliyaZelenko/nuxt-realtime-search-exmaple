@@ -11,7 +11,10 @@
     >
       <VCard>
         <VCardText>
-          <div class="list">
+          <div
+            ref="list"
+            class="list"
+          >
             <div class="list__search-field">
               <VTextField
                 v-model="searchStr"
@@ -172,7 +175,7 @@ export default {
         this.markControl()
       }
     },
-    searchDebounce: debounce(async function search () {
+    searchDebounce: debounce(async function () {
       this.loadingSearch = true
       this.list = await this.$content(CONTENT_NAME)
         .search(this.searchStr)
@@ -183,6 +186,7 @@ export default {
       this.infiniteId++
 
       await this.$nextTick()
+      this.$refs.list.scrollTop = 0
       this.markControl()
 
       // Hack to change URL without reloading page (miss Vue's state). There is no normal way to do this in Vue. If you try $router.replace, then the page state will be reset.

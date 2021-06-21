@@ -2,7 +2,9 @@
 
 Based on [this frontend technical assessment](https://www.notion.so/Frontend-technical-assessment-e498087f682e466c940e0382f18219dc).
 
-![image](https://user-images.githubusercontent.com/13103045/121210861-b30acd80-c884-11eb-9acd-91346667a824.png)
+### [Demo.](https://live-search-example.herokuapp.com/)
+
+[![image](https://user-images.githubusercontent.com/13103045/121210861-b30acd80-c884-11eb-9acd-91346667a824.png)](https://live-search-example.herokuapp.com/)
 
 ## Build Setup
 
